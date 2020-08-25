@@ -1,11 +1,13 @@
 
 const express = require('express')
+const cors = require('cors');
 const app = express()
 const port = 3001
 
+app.use(cors())
 app.get('/', (req, res) => {
   const { name } = req.query
-  res.send(`Hello ${name}!`)
+  res.json(`Hello ${name}!`)
 })
 
 app.listen(port, () => {
