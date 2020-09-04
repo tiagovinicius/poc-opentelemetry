@@ -1,9 +1,9 @@
-const { LogLevel } = require("@opentelemetry/core");
-const { NodeTracerProvider } = require("@opentelemetry/node");
-const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
-const { ZipkinExporter } = require("@opentelemetry/exporter-zipkin");
+import { LogLevel } from "@opentelemetry/core";
+import { NodeTracerProvider } from "@opentelemetry/node";
+import { SimpleSpanProcessor} from "@opentelemetry/tracing";
+import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 
-const provider = new NodeTracerProvider({
+const provider: NodeTracerProvider = new NodeTracerProvider({
     logLevel: LogLevel.ERROR
 });
 
@@ -14,6 +14,7 @@ provider.addSpanProcessor(
         new ZipkinExporter({
             serviceName: "api-darthvader",
         })
+        // new ConsoleSpanExporter()
     )
 );
 
