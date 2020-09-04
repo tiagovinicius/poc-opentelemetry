@@ -1,5 +1,3 @@
-'use strict';
-
 const { LogLevel } = require("@opentelemetry/core");
 const { NodeTracerProvider } = require("@opentelemetry/node");
 const { SimpleSpanProcessor } = require("@opentelemetry/tracing");
@@ -15,11 +13,9 @@ provider.addSpanProcessor(
     new SimpleSpanProcessor(
         new ZipkinExporter({
             serviceName: "api-darthvader",
-            // If you are running your tracing backend on another host,
-            // you can point to it using the `url` parameter of the
-            // exporter config.
         })
     )
 );
 
+// All set
 console.log("Tracing initialized");
