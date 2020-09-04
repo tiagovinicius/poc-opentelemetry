@@ -1,5 +1,4 @@
 import { SimpleSpanProcessor } from '@opentelemetry/tracing';
-// import { ConsoleSpanExporter } from '@opentelemetry/tracing';
 import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
@@ -7,7 +6,7 @@ import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 import { XMLHttpRequestPlugin } from '@opentelemetry/plugin-xml-http-request';
 import {ZipkinExporter} from "@opentelemetry/exporter-zipkin";
 
-// Minimum required setup - supports only synchronous operations
+// Supports only synchronous operations
 const provider = new WebTracerProvider({
     plugins: [
         new DocumentLoad(),
@@ -23,14 +22,13 @@ const provider = new WebTracerProvider({
 provider.addSpanProcessor(new SimpleSpanProcessor(
     new ZipkinExporter({
         serviceName: "front-ats",
-        // If you are running your tracing backend on another host,
-        // you can point to it using the `url` parameter of the
-        // exporter config.
     })
-    // new ConsoleSpanExporter()
+    // Use `new ConsoleSpanExporter()` to log on console
 ));
 provider.register();
 
+
+// Supports asynchronous operations
 const providerWithZone = new WebTracerProvider({
     plugins: [
         new DocumentLoad()
@@ -39,16 +37,14 @@ const providerWithZone = new WebTracerProvider({
 providerWithZone.addSpanProcessor(new SimpleSpanProcessor(
     new ZipkinExporter({
         serviceName: "front-ats",
-        // If you are running your tracing backend on another host,
-        // you can point to it using the `url` parameter of the
-        // exporter config.
     })
-    // new ConsoleSpanExporter()
+    // Use `new ConsoleSpanExporter()` to log on console
 ));
 
-// Changing default contextManager to use ZoneContextManager - supports asynchronous operations
 providerWithZone.register({
     contextManager: new ZoneContextManager().enable(),
 });
 
+
+// All set
 console.log("Tracing initialized");
