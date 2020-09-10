@@ -1,6 +1,6 @@
 import { LogLevel } from "@opentelemetry/core";
 import { NodeTracerProvider } from "@opentelemetry/node";
-import { SimpleSpanProcessor} from "@opentelemetry/tracing";
+import { ConsoleSpanExporter, SimpleSpanProcessor } from "@opentelemetry/tracing";
 import { ZipkinExporter } from "@opentelemetry/exporter-zipkin";
 
 const provider: NodeTracerProvider = new NodeTracerProvider({
@@ -14,9 +14,11 @@ provider.addSpanProcessor(
         new ZipkinExporter({
             serviceName: "api-darthvader",
         })
-        // new ConsoleSpanExporter()
     )
 );
 
-// All set
-console.log("Tracing initialized");
+provider.addSpanProcessor(
+    new SimpleSpanProcessor(
+        new ConsoleSpanExporter()
+    )
+);

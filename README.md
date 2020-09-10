@@ -23,6 +23,8 @@ Start the Tracing backend (Zipkin)
 
 `docker run --rm -d -p 9411:9411 --name zipkin openzipkin/zipkin`
 
-Access it over: `http://localhost:9411/zipkin/`
+Access it over: 
+
+`http://localhost:9411/zipkin/`
 
 
