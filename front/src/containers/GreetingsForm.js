@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { sayHello } from '../actions';
+import { sayHello, fetchSomeFail } from '../actions';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -30,6 +30,7 @@ let GreetingsForm = ({ dispatch }) => {
           />
           <InputGroup.Append>
             <Button type="submit">Say hello</Button>
+            <Button type="button" onClick={() => dispatch(fetchSomeFail())}>Fail</Button>
           </InputGroup.Append>
         </InputGroup>
       </Form.Group>

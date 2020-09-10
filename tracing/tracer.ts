@@ -1,4 +1,8 @@
-import { Span, SpanOptions, Tracer as Opentracer, SpanContext } from 'opentracing';
+import {
+  Span,
+  SpanOptions,
+  Tracer as OtlTracer
+} from "@opentelemetry/api";
 
 export type CreateTracerOptions = {
   enabled?: boolean;
@@ -61,30 +65,26 @@ function getOperationName({
   consumer,
 }: OperationNameOptions): string {
   if (operationName) {
-    return JSON.stringify({ operationName, isPromise });
+    return `${operationName}${isPromise ? '.promise' : ''}`;
   }
 
   if (component || method) {
-    return JSON.stringify({
-      component: component || 'Unnamed component',
-      method: method || 'Unnamed method',
-      isPromise,
-    });
+    return `${component || 'unknown'}.${method || 'unknown'}${isPromise ? '.promise' : ''}`;
   }
 
   if (url && requestMethod) {
-    return JSON.stringify({ url, requestMethod });
+    return `${requestMethod}//${url}`;
   }
 
 
   if (url && consumer) {
-    return JSON.stringify({ url, consumer });
+    return `${url}/${consumer}`;
   }
 
-  return JSON.stringify({ name: 'Unnamed component and method' });
+  return 'unknown';
 }
 
-function isFunction(fn): boolean {
+function isFunction(fn: any): boolean {
   return fn && typeof fn === 'function';
 }
 
@@ -93,29 +93,29 @@ function isPromise(fn: any): boolean {
 }
 
 export default class Tracer {
-  private opentracer: Opentracer;
+  private otlTracer: OtlTracer;
 
-  public constructor({ opentracer }: { opentracer: Opentracer }) {
-    if (!opentracer) {
-      throw new Error('A Opentracing compatible Tracer is needed.');
+  public constructor(otlTracer) {
+    if (!otlTracer) {
+      throw new Error('A Opentelemetry compatible Tracer is needed.');
     }
-    this.opentracer = opentracer;
+    this.otlTracer = otlTracer;
   }
 
-  private tracePromise(promise: any, nameOptions, span: Span): any {
+  private tracePromise(promise: any, nameOptions: any, span: Span): any {
     return promise
       .then((res: any) => {
         const name = getOperationName({ ...nameOptions, isPromise: true });
-        this.opentracer.startSpan(name, { childOf: span })
-          .setTag('result', res)
-          .finish();
+        this.otlTracer.startSpan(name, { parent: span })
+          .setAttribute(`${name}.result`, res)
+          .end();
         return res;
       })
       .catch((err: Error) => {
         const name = getOperationName({ ...nameOptions, isPromise: true });
-        this.opentracer.startSpan(name, { childOf: span })
-          .log({ event: 'error', name: err.name, message: err.message, stack: err.stack, 'error.object': err })
-          .finish();
+        this.otlTracer.startSpan(name, { parent: span })
+          .addEvent(`${name}.exception`, { 'exception.type': err.name, 'exception.message': err.message, 'exception.stacktrace': err.stack, 'error.object': err })
+          .end();
         throw err;
       });
   }
@@ -132,8 +132,8 @@ export default class Tracer {
     withSpanInArgs = false,
     spanOptions,
   }: TraceOptions,
-  originalFn,
-  originalArgs): any {
+  originalFn: any,
+  originalArgs: any): any {
     const nameOptions = { operationName, component, method, url, requestMethod };
 
     const name = getOperationName(nameOptions);
@@ -141,11 +141,11 @@ export default class Tracer {
       throw new Error(`Tried to trace ${name}, but it isn't a method/function`);
     }
 
-    const span: Span = this.opentracer.startSpan(name, spanOptions);
+    const span: Span = this.otlTracer.startSpan(name, spanOptions);
 
     if (withArgsLogged) {
       originalArgs.forEach(
-        (arg, index) => span.setTag(`param.${index}`, arg));
+        (arg: number, index: number) => span.setAttribute(`${name}.param.${index}`, arg));
     }
 
     try {
@@ -156,49 +156,25 @@ export default class Tracer {
 
       if (isPromise(result)) {
         if (withResultLogged) {
-          span.setTag('result', 'a promise is pending resolution.');
+          span.setAttribute(`${name}.result`, 'a promise is pending resolution.');
         }
-        return this.tracePromise(result, nameOptions, span);
+        // return this.tracePromise(result, nameOptions, span);
       }
 
       if (withResultLogged) {
-        span.setTag('result', result);
+        span.setAttribute(`${name}.result`, result);
       }
       return result;
     } catch (e) {
-      span.log({ event: 'error', name: e.name, message: e.message, stack: e.stack, 'error.object': e });
+      span.addEvent(`${name}.exception`, { 'exception.type': e.name, 'exception.message': e.message, 'exception.stacktrace': e.stack, 'error.object': e });
       throw e;
     } finally {
-      span.finish();
+      span.end();
     }
   }
 
   public startSpan(options: StartSpanOptions): Span {
     const name = getOperationName(options);
-    return this.opentracer.startSpan(name, options);
-  }
-
-  public extract(format: string, carrier: any): SpanContext | null {
-    return this.opentracer.extract(format, carrier);
+    return this.otlTracer.startSpan(name, options);
   }
 }
-
-export const NoopTracer = {
-  startSpan(): Span {
-    return new Span();
-  },
-
-  trace(
-    originalFn,
-    originalArgs,
-    originalContext: unknown,
-    withSpanInArgs = false,
-  ): any {
-    const result: any = originalFn.apply(
-      originalContext,
-      withSpanInArgs ? [...originalArgs, new Span()] : originalArgs,
-    );
-
-    return result;
-  },
-};
