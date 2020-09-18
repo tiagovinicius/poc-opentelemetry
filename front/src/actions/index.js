@@ -1,5 +1,6 @@
 export const SAY_HELLO = 'SAY_HELLO';
-export const FETCH_SOME_FAIL = 'FETCH_SOME_FAIL';
+export const WILL_FAIL_SAY_HELLO = 'WILL_FAIL_SAY_HELLO';
+export const SAY_HELLO_FAIL = 'SAY_HELLO_FAIL';
 
 export function sayHello(name) {
   return {
@@ -10,7 +11,7 @@ export function sayHello(name) {
 
 export function fetchSomeFail() {
   return {
-    type: FETCH_SOME_FAIL,
+    type: WILL_FAIL_SAY_HELLO,
   };
 }
 
