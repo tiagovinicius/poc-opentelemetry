@@ -6,6 +6,7 @@ export interface TracerFacade {
   startSpan: (StartSpanOptions) => Span;
   trace: (opt: TraceOptions, fn: Function) => ((...args: any[]) => any);
   traceRequest: (req: any, res: any, next: any) => void;
+  traceAction: (store: any) => Function;
 }
 
 const getTracer = (): Tracer => {
@@ -39,6 +40,19 @@ export class TracerFactory {
           res.on('finish', () => span.end());
         } catch (e) {
           next();
+        }
+      },
+      traceAction(store) {
+        return function (next) {
+          return function (action) {
+            const { type, error } = action;
+            if(!(type || '').startsWith('_FAIL')) next(action);
+            if(!(error)) next(action);
+            const span = this.startSpan({ action: action.type });
+            span.addEvent(`${name}.exception`, { 'exception.type': error.name, 'exception.message': error.message, 'exception.stacktrace': error.stack, 'error.object': error });
+            next(action);
+            span.end();
+          }
         }
       }
     }

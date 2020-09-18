@@ -3,11 +3,13 @@ import { WebTracerProvider } from '@opentelemetry/web';
 import { DocumentLoad } from '@opentelemetry/plugin-document-load';
 import { ZoneContextManager } from '@opentelemetry/context-zone';
 import { CollectorTraceExporter } from '@opentelemetry/exporter-collector';
+import { UserInteractionPlugin } from '@opentelemetry/plugin-user-interaction';
 
 // Supports asynchronous operations
 const provider = new WebTracerProvider({
     plugins: [
-        new DocumentLoad()
+        new DocumentLoad(),
+        new UserInteractionPlugin(),
     ]
 });
 

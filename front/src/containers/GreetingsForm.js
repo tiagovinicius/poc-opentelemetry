@@ -29,7 +29,7 @@ let GreetingsForm = ({ dispatch }) => {
             }}
           />
           <InputGroup.Append>
-            <Button type="submit">Say hello</Button>
+            <Button type="submit" id="say-hello-button">Say hello</Button>
             <Button type="button" onClick={() => dispatch(fetchSomeFail())}>Fail</Button>
           </InputGroup.Append>
         </InputGroup>
