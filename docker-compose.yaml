@@ -1,0 +1,29 @@
+version: "2"
+services:
+  # Zipkin
+  zipkin-all-in-one:
+    image: openzipkin/zipkin:latest
+    ports:
+      - "9411:9411"
+
+  # Collector
+  otel-collector:
+    image: "otel/opentelemetry-collector-dev:latest"
+    command: ["--config=/etc/otel-collector-config.yaml", ""]
+    volumes:
+      - ./otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    ports:
+      - "55678"       # OpenCensus receiver
+    depends_on:
+      - zipkin-all-in-one
+
+  # Agent
+  otel-agent:
+    image: "otel/opentelemetry-collector-dev:latest"
+    command: ["--config=/etc/otel-agent-config.yaml", ""]
+    volumes:
+      - ./otel-agent-config.yaml:/etc/otel-agent-config.yaml
+    ports:
+      - "55681:55681"
+    depends_on:
+      - otel-collector
