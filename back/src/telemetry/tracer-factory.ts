@@ -49,7 +49,7 @@ export class TracerFactory {
             if(!(type || '').startsWith('_FAIL')) next(action);
             if(!(error)) next(action);
             const span = this.startSpan({ action: action.type });
-            span.addEvent(`${name}.exception`, { 'exception.type': error.name, 'exception.message': error.message, 'exception.stacktrace': error.stack, 'error.object': error });
+            span.addEvent(`${type}.exception`, { 'exception.type': error.name, 'exception.message': error.message, 'exception.stacktrace': error.stack, 'error.object': error });
             next(action);
             span.end();
           }
