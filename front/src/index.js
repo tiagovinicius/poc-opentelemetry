@@ -7,7 +7,7 @@ import createSagaMiddleware from 'redux-saga';
 import App from './App';
 import greetings from './reducers';
 import rootSaga from './sagas';
-import { TracerFactory } from './tracing/tracer-factory';
+import { TracerFactory } from './telemetry/tracer-factory';
 
 const { traceAction, traceUserInteraction } = new TracerFactory().create();
 document.addEventListener("click", traceUserInteraction);
