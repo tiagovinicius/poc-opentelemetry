@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev --respawn --transpile-only -r ./tracing.ts ./src/index.ts"
+    "start": "ts-node-dev --respawn --transpile-only -r ./telemetry.ts ./src/index.ts"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +14,7 @@
     "@opentelemetry/exporter-collector": "^0.11.0",
     "@opentelemetry/exporter-zipkin": "^0.11.0",
     "@opentelemetry/node": "^0.11.0",
+    "@opentelemetry/api": "^0.11.0",
     "@opentelemetry/plugin-express": "^0.9.0",
     "@opentelemetry/plugin-http": "^0.11.0",
     "@opentelemetry/shim-opentracing": "^0.11.0",

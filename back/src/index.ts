@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { TracerFactory } from '../../tracing';
+import { TracerFactory } from './telemetry';
 
 const app = express();
 const port = 3001;

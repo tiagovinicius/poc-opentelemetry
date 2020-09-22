@@ -18,12 +18,13 @@ In frontend root directory `/front/` run:
 
 
 ## Running the Telemetry
-### Dependencies
-Start the Tracing backend (Zipkin)
+Start the telemetry agent, collector and backend (Zipkin)
 
-`docker run --rm -d -p 9411:9411 --name zipkin openzipkin/zipkin`
+In project's root directory run:
 
-Access it over: 
+`docker-compose up`
+
+Access the telemetry backend at: 
 
 `http://localhost:9411/zipkin/`
 
