@@ -28,4 +28,6 @@ Access the telemetry backend at:
 
 `http://localhost:9411/zipkin/`
 
-
+## Contributors
+@flaviabarreto
+@jgmenezes
